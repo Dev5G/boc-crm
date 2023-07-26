@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum DeviceType {
+  Mobile
+  Tablet
+  Laptop
+}
+
+model Customer {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String
+  phone_number String
+  address      String
+  city         String
+  state        String
+  zip_code     Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  sims    Sim[]
+  devices Device[]
+  usage   Usage[]
+}
+
+model Sim {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  esn        String
+  mdn        String?
+  imei       String?
+  status     String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?   @db.ObjectId
+  carrier    Carrier?  @relation(fields: [carrierId], references: [id])
+  carrierId  String?   @db.ObjectId
+  device     Device?   @relation(fields: [deviceId], references: [id])
+  deviceId   String?   @db.ObjectId
+}
+
+model Device {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  esn         String?
+  mdn         String
+  imei        String?
+  model       String?
+  make        String?
+  status      String?
+  device_type DeviceType @default(Mobile)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  usage      Usage[]
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?   @db.ObjectId
+  carrier    Carrier?  @relation(fields: [carrierId], references: [id])
+  carrierId  String?   @db.ObjectId
+  sims       Sim[]
+
+  shippingInfo ShippingInfo?
+}
+
+model Carrier {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  logo       String?
+  address    String?
+  city       String?
+  state      String?
+  zip_code   String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  sims    Sim[]
+  devices Device[]
+}
+
+model Usage {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  voiceMinutes Int
+  dataMb       Int
+  smsCount     Int
+  planName     String
+  planCode     Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  device     Device?   @relation(fields: [deviceId], references: [id])
+  deviceId   String    @db.ObjectId
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?   @db.ObjectId
+}
+
+model ShippingInfo {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  address        String
+  city           String
+  state          String
+  zip_code       String
+  trackingNumber String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  device   Device @relation(fields: [deviceId], references: [id])
+  deviceId String @unique @db.ObjectId
+}

@@ -10,7 +10,6 @@ import { SortOrder } from '@/types';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Routes } from '@/config/routes';
-import TypeFilter from '@/components/category/type-filter';
 import { adminOnly } from '@/utils/auth-utils';
 import { useCategoriesQuery } from '@/data/category';
 import { useRouter } from 'next/router';
@@ -21,7 +20,7 @@ export default function Devices() {
   const { locale } = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [type, setType] = useState('');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState('next');
   const { t } = useTranslation();
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
@@ -33,7 +32,7 @@ export default function Devices() {
     sortedBy,
     language: locale,
   });
-  
+
   if (loading) return <Loader text={t('common:text-loading')} />;
   if (error) return <ErrorMessage message={error.message} />;
   function handleSearch({ searchText }: { searchText: string }) {

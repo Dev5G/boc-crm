@@ -49,7 +49,6 @@ export enum ProductStatus {
   Publish = 'publish',
   Draft = 'draft',
 }
-
 export enum WithdrawStatus {
   Approved = 'APPROVED',
   Pending = 'PENDING',
@@ -117,30 +116,37 @@ export interface GetParams {
 export interface QueryOptions {
   language: string;
   limit?: number;
-  page?: number;
+  cursor?: string;
+  page?: string;
+  type?: string;
   orderBy?: string;
   sortedBy?: SortOrder;
 }
 
+export interface File {
+  public_id: string;
+  fileName: string;
+  status: string;
+  processedRows: number;
+  created_at: Date;
+  updated_at: Date;
+}
 export interface ShopSocialInput {
   icon?: string;
   url?: string;
 }
 
 export interface PaginatorInfo<T> {
-  current_page: number;
-  body: { data: T[] };
-  first_page_url: string;
-  from: number;
-  last_page: number;
-  last_page_url: string;
-  links: any[];
-  next_page_url: string | null;
-  path: string;
-  per_page: number;
-  prev_page_url: string | null;
-  to: number;
-  total: number;
+  body: {
+    message: string;
+    data: T[];
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor: string;
+      startCursor: string;
+      hasPrevPage: boolean;
+    };
+  };
 }
 
 export interface LoginInput {
@@ -818,6 +824,17 @@ export interface CreateUsageInput {
   customer?: Customer;
   device?: Device;
 }
+export interface CreateFileInput {
+  voiceMinutes: number;
+  dataMb: number;
+  smsCount: number;
+  planName: string;
+  planCode: number;
+  createdAt?: string;
+  updatedAt?: string;
+  customer?: Customer;
+  device?: Device;
+}
 export interface CreateSimInput {
   mdn?: string;
   // type_id?: string;
@@ -1387,14 +1404,30 @@ export interface CustomerQueryOptions extends QueryOptions {
 }
 
 export interface UsageQueryOptions extends QueryOptions {
-  voiceMinutes: number;
-  dataMb: number;
-  smsCount: number;
-  createdAt: string;
-  updatedAt: string;
+  id: number;
+  dateFilter: number;
   mdn: string;
+  usage: [];
+  latestPlanCode: number;
+  latestPlanName: string;
+  averageVoiceMinutes: number;
+  averageDataMb: number;
+  averageSmsCount: number;
 }
-
+export interface FileQueryOptions extends QueryOptions {
+  public_id: string;
+}
+export interface UsageReport extends QueryOptions {
+  id: number;
+  mdn: string;
+  usage: [];
+  latestPlanCode: number;
+  latestPlanName: string;
+  averageVoiceMinutes: number;
+  averageDataMb: number;
+  averageSmsCount: number;
+  planSuggestion: string;
+}
 export interface SimQueryOptions extends QueryOptions {
   mdn: string;
   esn: string;
@@ -1577,6 +1610,8 @@ export interface DevicePaginator extends PaginatorInfo<Device> {}
 export interface SimPaginator extends PaginatorInfo<Device> {}
 export interface CustomerPaginator extends PaginatorInfo<Customer> {}
 export interface UsagePaginator extends PaginatorInfo<Usage> {}
+export interface UsageReportPaginator extends PaginatorInfo<UsageReport> {}
+export interface FilePaginator extends PaginatorInfo<File> {}
 
 export interface TaxPaginator extends PaginatorInfo<Tax> {}
 

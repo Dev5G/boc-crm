@@ -11,6 +11,7 @@ import {
   GetParams,
   UsageQueryOptions,
   UsagePaginator,
+  UsageReportPaginator,
 } from '@/types';
 import { mapPaginatorData } from '@/utils/data-mappers';
 // import { categoryClient } from './client/category';
@@ -78,7 +79,7 @@ export const useUsageQuery = ({ slug }: { slug: string }) => {
 };
 
 export const useUsagesQuery = (options: Partial<UsageQueryOptions>) => {
-  const { data, error, isLoading } = useQuery<UsagePaginator, Error>(
+  const { data, error, isLoading } = useQuery<UsageReportPaginator, Error>(
     [API_ENDPOINTS.USAGES, options],
     ({ queryKey, pageParam }) =>
       usageClient.paginated(Object.assign({}, queryKey[1], pageParam)),
@@ -87,12 +88,12 @@ export const useUsagesQuery = (options: Partial<UsageQueryOptions>) => {
     }
   );
   console.log('🚀 ~ file: usage.ts:82 ~ useUsagesQuery ~ data:', {
-    data: data?.body.data,
+    data: data,
   });
 
   return {
     usages: data?.body.data ?? [],
-    paginatorInfo: mapPaginatorData(data),
+    pageInfo: data?.body.pageInfo,
     error,
     loading: isLoading,
   };

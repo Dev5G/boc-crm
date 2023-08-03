@@ -10,40 +10,52 @@ import { SortOrder } from '@/types';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Routes } from '@/config/routes';
-import TypeFilter from '@/components/category/type-filter';
 import { adminOnly } from '@/utils/auth-utils';
 import { useRouter } from 'next/router';
 import { Config } from '@/config';
 import { useUsagesQuery } from '@/data/usage';
 import cn from 'classnames';
-import { HiArrowDown } from 'react-icons/hi';
+import { HiArrowDown, HiArrowUp } from 'react-icons/hi';
+import UsageFilter from '@/components/usage/usage-filter';
 export default function Usages() {
   const { locale } = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
+  const [cursor, setCursor] = useState('');
   const [type, setType] = useState('');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState<string>();
+  const [dateFilter, setDateFilter] = useState<number>(14);
   const { t } = useTranslation();
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
   const [visible, setVisible] = useState(false);
-  const { usages, paginatorInfo, loading, error } = useUsagesQuery({
+  const { usages, pageInfo, loading, error } = useUsagesQuery({
     limit: 20,
     page,
+    cursor,
     mdn: searchTerm,
     orderBy,
+    type,
     sortedBy,
+    dateFilter,
     language: locale,
   });
 
   if (loading) return <Loader text={t('common:text-loading')} />;
   if (error) return <ErrorMessage message={error.message} />;
   function handleSearch({ searchText }: { searchText: string }) {
-    // setSearchTerm(searchText);
+    setSearchTerm(searchText);
     // setPage(1);
   }
 
-  function handlePagination(current: any) {
+  function handlePagination(current: string) {
+    console.log(
+      '🚀 ~ file: index.tsx:49 ~ handlePagination ~ current:',
+      current,
+      pageInfo
+    );
     setPage(current);
+    if (current === 'next' && pageInfo) setCursor(pageInfo.endCursor);
+    else if (current === 'prev' && pageInfo) setCursor(pageInfo.startCursor);
   }
 
   const toggleVisible = () => {
@@ -69,7 +81,7 @@ export default function Usages() {
           >
             {t('common:text-filter')}{' '}
             {visible ? (
-              <HiArrowDown className="ms-2" />
+              <HiArrowUp className="ms-2" />
             ) : (
               <HiArrowDown className="ms-2" />
             )}
@@ -83,23 +95,31 @@ export default function Usages() {
           })}
         >
           <div className="mt-5 flex w-full flex-col border-t border-gray-200 pt-5 md:mt-8 md:flex-row md:items-center md:pt-8">
-            {/* <CategoryTypeFilter
+            <UsageFilter
               className="w-full"
-              onCategoryFilter={({ slug }: { slug: string }) => {
-                setPage(1);
-                setCategory(slug);
+              onReportTypeChange={({ value }) => {
+                console.log(
+                  '🚀 ~ file: index.tsx:101 ~ Usages ~ value:',
+                  value
+                );
+                setType(value); 
+                // setPage(1);
+                // setCategory(slug);
               }}
-              onTypeFilter={({ slug }: { slug: string }) => {
-                setType(slug);
-                setPage(1);
+              dateFilter={dateFilter}
+              onDateChange={({ value }) => {
+                // console.log('🚀 ~ file: index.tsx:94 ~ Usages ~ e:', e);
+                setDateFilter(value);
+                // setType(id);
+                // setPage(1);
               }}
-            /> */}
+            />
           </div>
         </div>
       </Card>
       <UsageList
         usages={usages}
-        paginatorInfo={paginatorInfo}
+        pageInfo={pageInfo}
         onPagination={handlePagination}
         onOrder={setOrder}
         onSort={setColumn}

@@ -1,6 +1,6 @@
 import Pagination from '@/components/ui/pagination';
 import { Table } from '@/components/ui/table';
-import { Usage, SortOrder, MappedPaginatorInfo } from '@/types';
+import { Usage, SortOrder, MappedPaginatorInfo, UsageReport } from '@/types';
 import { useTranslation } from 'next-i18next';
 import { useIsRTL } from '@/utils/locals';
 import { useState } from 'react';
@@ -9,17 +9,26 @@ import { Config } from '@/config';
 import Link from '@/components/ui/link';
 import { Routes } from '@/config/routes';
 import LanguageSwitcher from '@/components/ui/lang-action/action';
-
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
+import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
+import Badge from '../ui/badge/badge';
+import PlanColor from './plan-color';
+export type IPageInfo = {
+  hasNextPage: boolean;
+  endCursor: string;
+  startCursor: string;
+  hasPrevPage: boolean;
+};
 export type IProps = {
-  usages: Usage[] | undefined;
-  paginatorInfo: MappedPaginatorInfo | null;
-  onPagination: (key: number) => void;
+  usages: UsageReport[] | undefined;
+  pageInfo: IPageInfo | undefined;
+  onPagination: (key: string) => void;
   onSort: (current: any) => void;
   onOrder: (current: string) => void;
 };
 const UsageList = ({
   usages,
-  paginatorInfo,
+  pageInfo,
   onPagination,
   onSort,
   onOrder,
@@ -77,97 +86,65 @@ const UsageList = ({
       onHeaderCell: () => onHeaderClick('mdn'),
     },
     {
-      title: t('table:table-item-average'),
-      dataIndex: 'usage',
-      key: 'usage',
+      title: t('table:table-item-plan-code'),
+      dataIndex: 'latestPlanCode',
+      key: 'latestPlanCode',
       align: alignLeft,
       width: 150,
-      render: (usage: any[]) => {
-        if (!usage) return 0;
-        console.log({ usage });
-        return <div className="relative mx-auto h-10 w-10">0.0</div>;
-      },
     },
-    // {
-    //   title: t('table:table-item-details'),
-    //   dataIndex: 'details',
-    //   key: 'details',
-    //   ellipsis: true,
-    //   align: alignLeft,
-    //   width: 200,
-    // },
-    // {
-    //   title: t('table:table-item-image'),
-    //   dataIndex: 'image',
-    //   key: 'image',
-    //   align: 'center',
-    //   width: 180,
-
-    //   render: (image: any, { name }: { name: string }) => {
-    //     if (!image?.thumbnail) return null;
-
-    //     return (
-    //       <div className="relative mx-auto h-10 w-10">
-    //         <Image
-    //           src={image?.thumbnail ?? '/'}
-    //           alt={name}
-    //           fill
-    //           sizes="(max-width: 768px) 100vw"
-    //           className="overflow-hidden rounded object-fill"
-    //         />
-    //       </div>
-    //     );
-    //   },
-    // },
-    // {
-    //   title: t('table:table-item-icon'),
-    //   dataIndex: 'icon',
-    //   key: 'icon',
-    //   align: 'center',
-    //   width: 120,
-    //   render: (icon: string) => {
-    //     if (!icon) return null;
-    //     return (
-    //       <span className="flex items-center justify-center">
-    //         {getIcon({
-    //           iconList: categoriesIcon,
-    //           iconName: icon,
-    //           className: 'w-5 h-5 max-h-full max-w-full',
-    //         })}
-    //       </span>
-    //     );
-    //   },
-    // },
-    // {
-    //   title: t('table:table-item-slug'),
-    //   dataIndex: 'slug',
-    //   key: 'slug',
-    //   align: 'center',
-    //   ellipsis: true,
-    //   width: 150,
-    //   render: (slug: any) => (
-    //     <div
-    //       className="overflow-hidden truncate whitespace-nowrap"
-    //       title={slug}
-    //     >
-    //       {slug}
-    //     </div>
-    //   ),
-    // },
     {
-      title: t('table:table-item-actions'),
-      dataIndex: 'id',
+      title: t('table:table-item-plan-name'),
+      dataIndex: 'latestPlanName',
+      key: 'latestPlanCode',
+      align: alignLeft,
+      width: 150,
+    },
+    {
+      title: t('table:table-item-sms-count'),
+      dataIndex: 'averageSmsCount',
+      key: 'averageSmsCount',
+      align: alignLeft,
+      width: 150,
+    },
+    {
+      title: t('table:table-item-voice-minutes'),
+      dataIndex: 'averageVoiceMinutes',
+      key: 'averageVoiceMinutes',
+      align: alignLeft,
+      width: 150,
+    },
+    {
+      title: t('table:table-item-data-mb'),
+      dataIndex: 'averageDataMb',
+      key: 'averageDataMb',
+      align: alignLeft,
+      width: 150,
+    },
+    {
+      title: t('table:table-item-plan-suggestion'),
+      dataIndex: 'planSuggestion',
       key: 'actions',
       align: alignRight,
       width: 290,
-      render: (id: string, record: Usage) => (
-        <LanguageSwitcher
-          slug={id}
-          record={record}
-          deleteModalView="DELETE_CATEGORY"
-          routes={Routes?.usages}
+      render: (id: string, record: UsageReport) => (
+        <Badge
+          text={record.planSuggestion}
+          color={PlanColor(record.planSuggestion)}
         />
       ),
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'actions',
+      align: alignRight,
+      width: 290,
+      // render: (id: string, record: UsageReport) => (
+      //   <Badge
+      //     text={record.planSuggestion}
+      //     color={PlanColor(record.planSuggestion)}
+      //   />
+      // ),
     },
   ];
 
@@ -188,14 +165,34 @@ const UsageList = ({
         />
       </div>
 
-      {!!paginatorInfo?.total && (
-        <div className="flex items-center justify-end">
-          <Pagination
-            total={paginatorInfo.total}
-            current={paginatorInfo.currentPage}
-            pageSize={paginatorInfo.perPage}
+      {!!pageInfo && (
+        <div className="flex items-center justify-end gap-2">
+          {/* <Pagination
+            // current={paginatorInfo.currentPage}
+            // pageSize={paginatorInfo.perPage}
             onChange={onPagination}
-          />
+          /> */}
+          {pageInfo.hasPrevPage && (
+            <div
+              className="h-8 w-8 flex items-center justify-center rounded border-2 border-slate-300 cursor-pointer hover:border-slate-400"
+              onClick={() => {
+                onPagination('prev');
+              }}
+            >
+              <RiArrowLeftSLine />
+            </div>
+          )}
+          {pageInfo.hasNextPage && (
+            <div
+              className="h-8 w-8 flex items-center justify-center rounded border-2 border-slate-300 cursor-pointer hover:border-slate-400"
+              onClick={() => {
+                onPagination('next');
+              }}
+            >
+              <RiArrowRightSLine />
+            </div>
+          )}
+          {/* <MdKeyboardArrowLeft /> */}
         </div>
       )}
     </>

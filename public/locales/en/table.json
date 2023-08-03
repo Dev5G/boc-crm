@@ -71,5 +71,11 @@
   "table-item-receiver": "Receiver",
   "table-item-effective-from": "Effective From",
   "table-item-expired-at": "Expired At",
-  "table-item-issued-by": "Issued By"
+  "table-item-issued-by": "Issued By",
+  "table-item-plan-code": "Code",
+  "table-item-plan-name": "Current Plan",
+  "table-item-voice-minutes": "Voice",
+  "table-item-data-mb": "Data",
+  "table-item-sms-count": "Sms",
+  "table-item-plan-suggestion": "Plan Suggestion"
 }

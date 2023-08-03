@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
   CATEGORIES: 'categories',
   DEVICES: 'devices',
   USAGES: 'usages',
+  Files: 'files',
   SIMS: 'sims',
   TAGS: 'tags',
   TYPES: 'types',

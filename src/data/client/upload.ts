@@ -3,18 +3,22 @@ import { API_ENDPOINTS } from './api-endpoints';
 import { Attachment } from '@/types';
 
 export const uploadClient = {
-  upload: async (variables: any) => {
+  upload: async (
+    file: any,
+    data: any,
+    url: string = '/api/v2/usages/create/bulk'
+  ) => {
     let formData = new FormData();
-    variables.forEach((attachment: any) => {
-      formData.append('attachment[]', attachment);
-    });
+
+    formData.append('file', file);
+    formData.append('data', data);
     const options = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     };
-    return HttpClient.post<Attachment>(
-      API_ENDPOINTS.ATTACHMENTS,
+    return HttpClient.post<{ status: number; data: any; error: string }>(
+      url,
       formData,
       options
     );

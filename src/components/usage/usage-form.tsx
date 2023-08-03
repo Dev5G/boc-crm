@@ -36,6 +36,8 @@ import { state_names } from '@/data/constant';
 import { DatePicker } from '../ui/date-picker';
 
 import { WorkBook, read, utils, readFile } from 'xlsx';
+import { uploadClient } from '@/data/client/upload';
+import { toast } from 'react-toastify';
 // export const updatedIcons = usageIcons.map((item: any) => {
 //   item.label = (
 //     <div key={item.value} className="flex items-center space-s-5">
@@ -79,7 +81,6 @@ import { WorkBook, read, utils, readFile } from 'xlsx';
 //     </div>
 //   );
 // }
-
 type FormValues = {
   file: File[];
   date: string;
@@ -97,8 +98,8 @@ type IProps = {
 export default function CreateOrUpdateUsagesForm({ initialValues }: IProps) {
   const router = useRouter();
   const { t } = useTranslation();
-  const [excelData, setExcelData] = useState<any[][]>([]);
-  const [date, setDate] = useState<string>(Date.now().toString());
+  const [date, setDate] = useState<string>(new Date().toString());
+
   const {
     register,
     handleSubmit,
@@ -133,39 +134,48 @@ export default function CreateOrUpdateUsagesForm({ initialValues }: IProps) {
       // createUsage({
       //   ...input,
       // });
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target) {
-          const bstr = e.target.result;
-          const wb = read(bstr, { type: 'binary' });
-          const ws = wb.Sheets['Usage'];
-          const jsonData = utils.sheet_to_json<any[]>(ws, { header: 1 });
-          const tempData: any[] = [];
-          jsonData.slice(1).forEach((row, index) => {
-            tempData.push({
-              device: { mdn: row[0] },
-              planCode: row[1],
-              planName: row[2],
-              voiceMinutes: row[3],
-              smsCount: row[4],
-              dataMb: row[5],
-            });
-          });
-          console.log(
-            '🚀 ~ file: page.tsx:27 ~ useEffect ~ tempData:',
-            tempData
-          );
-          createUsage({
-            data: { ...tempData },
-            count: jsonData.length -1,
-            date,
-          });
+      //todo upload to cloud and use the cloud to read the file and process it on the backend server
+      const {status}= await uploadClient.upload(values.file[0], {
+        name: 'some name',
+      });
+      console.log(
+        '🚀 ~ file: usage-form.tsx:138 ~ onSubmit ~ file:',
+        values.file,
+      );
+        if(status === 200){
+          toast.success('File was successfully uploaded')
+
         }
-      };
-      reader.readAsBinaryString(input.file);
-      // const d = read(input.file);
-      // console.log('🚀 ~ file: usage-form.tsx:139 ~ onSubmit ~ d:', d);
-      // updateWorkBook(d);
+      // const reader = new FileReader();
+      // reader.onload = (e) => {
+      //   if (e.target) {
+      //     const bstr = e.target.result;
+      //     const wb = read(bstr, { type: 'binary' });
+      //     const ws = wb.Sheets['Usage'];
+      //     const jsonData = utils.sheet_to_json<any[]>(ws, { header: 1 });
+      //     const tempData: any[] = [];
+      //     jsonData.slice(1).forEach((row, index) => {
+      //       tempData.push({
+      //         device: { mdn: row[0] },
+      //         planCode: row[1],
+      //         planName: row[2],
+      //         voiceMinutes: row[3],
+      //         smsCount: row[4],
+      //         dataMb: row[5],
+      //       });
+      //     });
+      //     console.log(
+      //       '🚀 ~ file: page.tsx:27 ~ useEffect ~ tempData:',
+      //       tempData
+      //     );
+      //     createUsage({
+      //       data: { ...tempData },
+      //       count: jsonData.length,
+      //       date,
+      //     });
+      //   }
+      // };
+      // reader.readAsBinaryString(input.file);
     } else {
       // updateUsage({
       //   ...input,
@@ -241,7 +251,10 @@ export default function CreateOrUpdateUsagesForm({ initialValues }: IProps) {
             value={date}
             onChange={(e) => {
               console.log({ e });
-              if (!!e) setDate(e.toString());
+              if (!!e)
+                setDate(
+                  `${e.getFullYear()}/${e.getMonth() + 1}/${e.getDate()}`
+                );
             }}
           />
           {/* <Input

@@ -23,14 +23,14 @@ export const siteSettings = {
   },
   headerLinks: [],
   authorizedLinks: [
-    {
-      href: Routes.profileUpdate,
-      labelTransKey: 'authorized-nav-item-profile',
-    },
-    {
-      href: Routes.logout,
-      labelTransKey: 'authorized-nav-item-logout',
-    },
+    // {
+    //   href: Routes.profileUpdate,
+    //   labelTransKey: 'authorized-nav-item-profile',
+    // },
+    // {
+    //   href: Routes.logout,
+    //   labelTransKey: 'authorized-nav-item-logout',
+    // },
   ],
   currencyCode: 'USD',
   sidebarLinks: {
@@ -57,6 +57,12 @@ export const siteSettings = {
       },
       {
         href: Routes.usages.list,
+        label: 'sidebar-nav-item-usages',
+        icon: TbDeviceAnalytics,
+      },
+
+      {
+        href: Routes.files.list,
         label: 'sidebar-nav-item-usages',
         icon: TbDeviceAnalytics,
       },
@@ -137,42 +143,6 @@ export const siteSettings = {
         label: 'sidebar-nav-item-dashboard',
         icon: 'DashboardIcon',
         permissions: adminOwnerAndStaffOnly,
-      },
-      {
-        href: (shop: string) => `/${shop}${Routes.product.list}`,
-        label: 'sidebar-nav-item-products',
-        icon: 'ProductsIcon',
-        permissions: adminOwnerAndStaffOnly,
-      },
-      {
-        href: (shop: string) => `/${shop}${Routes.order.list}`,
-        label: 'sidebar-nav-item-orders',
-        icon: 'OrdersIcon',
-        permissions: adminOwnerAndStaffOnly,
-      },
-      {
-        href: (shop: string) => `/${shop}${Routes.staff.list}`,
-        label: 'sidebar-nav-item-staffs',
-        icon: 'UsersIcon',
-        permissions: adminAndOwnerOnly,
-      },
-      {
-        href: (shop: string) => `/${shop}${Routes.withdraw.list}`,
-        label: 'sidebar-nav-item-withdraws',
-        icon: 'AttributeIcon',
-        permissions: adminAndOwnerOnly,
-      },
-      {
-        href: (shop: string) => `/${shop}${Routes.reviews.list}`,
-        label: 'sidebar-nav-item-reviews',
-        icon: 'ReviewIcon',
-        permissions: adminAndOwnerOnly,
-      },
-      {
-        href: (shop: string) => `/${shop}${Routes.question.list}`,
-        label: 'sidebar-nav-item-questions',
-        icon: 'QuestionIcon',
-        permissions: adminAndOwnerOnly,
       },
     ],
   },

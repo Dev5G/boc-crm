@@ -4,6 +4,7 @@ import {
   UsageQueryOptions,
   CreateUsageInput,
   QueryOptions,
+  UsageReportPaginator,
 } from '@/types';
 import { API_ENDPOINTS } from './api-endpoints';
 import { crudFactory } from './curd-factory';
@@ -16,7 +17,7 @@ export const usageClient = {
   >(`api/${API_ENDPOINTS.USAGES}`),
   paginated: ({ ...params }: Partial<UsageQueryOptions>) => {
     console.log('🚀 ~ file: device.ts:21 ~ paginated');
-    return HttpClient.get<UsagePaginator>(`api/${API_ENDPOINTS.USAGES}`, {
+    return HttpClient.get<UsageReportPaginator>(`api/${API_ENDPOINTS.USAGES}`, {
       searchJoin: 'and',
       ...params,
       // search: HttpClient.formatSearchParams({ mdn, esn }),

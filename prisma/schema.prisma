@@ -16,6 +16,13 @@ enum DeviceType {
   Laptop
 }
 
+enum StatusType {
+  Pending
+  Uploaded
+  Processing
+  Completed
+}
+
 model Customer {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String
@@ -97,7 +104,7 @@ model Usage {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  device     Device?   @relation(fields: [deviceId], references: [id])
+  device     Device    @relation(fields: [deviceId], references: [id])
   deviceId   String    @db.ObjectId
   customer   Customer? @relation(fields: [customerId], references: [id])
   customerId String?   @db.ObjectId
@@ -110,9 +117,20 @@ model ShippingInfo {
   state          String
   zip_code       String
   trackingNumber String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   device   Device @relation(fields: [deviceId], references: [id])
   deviceId String @unique @db.ObjectId
+}
+
+model FileUploads {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  public_id     String
+  fileName      String
+  status        StatusType @default(Pending)
+  processedRows Int        @default(0)
+  rowCount      Int        @default(0)
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 }

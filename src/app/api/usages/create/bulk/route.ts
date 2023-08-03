@@ -5,21 +5,29 @@ import { SendResponse } from '../../../utils';
 
 export async function POST(req: Request, res: Response) {
   const { data, date, count } = await req.json();
+  console.log(
+    '🚀 ~ file: route.ts:8 ~ POST ~ data, date, count:',
+    // data,
+    date,
+    count
+  );
+  const newDate = new Date(date.toString());
+  newDate.setDate(newDate.getDate() + 1);
+  
   // const { data, date }: { data: CreateUsageInput[]; date: string } =
-
+  
   if (!!data) {
-    console.log('🚀 ~ file: bulk.ts:9 ~ POST ~ : ', data[0], date, count);
-    
+
     try {
       const length = data.length;
       console.log('🚀 ~ file: route.ts:16 ~ POST ~ length:', length);
 
-      for (let i = 0; 937; i++) {
+      for (let i = 18645; i <= count; i++) {
         const device = await prisma.device.findFirst({
           where: { mdn: data[i].device?.mdn },
           select: { id: true },
         });
-        
+
         if (!!device) {
           console.log('🚀 ~ file: route.ts:23 ~ POST ~ Found:', device);
           const usage = await prisma.usage.create({
@@ -30,7 +38,7 @@ export async function POST(req: Request, res: Response) {
               deviceId: device.id,
               planName: data[i].planName,
               planCode: Number(data[i].planCode) || 0,
-              ...(date && { createdAt: new Date(date).toISOString() }),
+              ...(newDate && { createdAt: newDate }),
             },
           });
           console.log('🚀 ~ file: route.ts:14 ~ POST ~ created:', i);
@@ -52,7 +60,7 @@ export async function POST(req: Request, res: Response) {
                   deviceId: device.id,
                   planName: data[i].planName,
                   planCode: Number(data[i].planCode) || 0,
-                  ...(date && { createdAt: new Date(date).toISOString() }),
+                  ...(newDate && { createdAt: newDate }),
                 },
               });
             }
